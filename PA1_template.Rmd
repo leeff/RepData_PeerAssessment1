@@ -60,12 +60,13 @@ nrow(data[is.na(data$steps),])
 
 ```{r, echo=TRUE}
 # calculate mean for each 5 minute interval
+library(plyr)
 meanStepsByInterval <- ddply(data,.(interval),summarize,mean=mean(steps,na.rm=TRUE))
 # replace NA values
 dataComplete <- data;
 for (i in nrow(dataComplete)) {
   if (is.na(dataComplete[i,"steps"]))
-    dataComplete[i,"steps"] <- meanStepsByInterval[meanStepsByInterval$interval==dataComplete[i,"interval"],"steps"]
+    dataComplete[i,"steps"] <- meanStepsByInterval[meanStepsByInterval$interval==dataComplete[i,"interval"],"mean"]
 }
 ```
 
@@ -73,7 +74,6 @@ for (i in nrow(dataComplete)) {
 ```{r, echo=TRUE,fig.height=4}
 totalStepsPerDay <- aggregate(steps~date,data=dataComplete,FUN=sum)
 hist(totalStepsPerDay$steps,col=c("blue"),main="total number of steps taken per day",xlab="date")
-dev.off()
 ```
 4. Here are the mean and median total number of steps taken per day.
 ```{r, echo=TRUE}
@@ -81,5 +81,7 @@ m1 <- mean(totalStepsPerDay[,2])
 m2 <- median(totalStepsPerDay[,2])
 ```
 The mean and median total number of steps taken per day are `r m1` and `r m2` respectively.
+
+As can be seen, the impact of filling in NA data is that 
 
 ## Are there differences in activity patterns between weekdays and weekends?
